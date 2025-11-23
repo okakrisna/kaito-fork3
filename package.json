@@ -1,0 +1,7 @@
+{
+  "name": "kaito-wedding",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npx serve kaito.com -p 5173"
+  }
+}
