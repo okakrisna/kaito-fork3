@@ -7847,10 +7847,29 @@ jQuery(document).ready(function ($) {
 })();
 
 function updateContent(data) {
+  console.log('Updating content with data:', data);
+
   // Update all text content
   if(data.hero_title){var a=document.getElementById('hero-title');if(a)a.textContent=data.hero_title;var b=document.getElementById('hero-title-2');if(b)b.textContent=data.hero_title_2||data.hero_title;}
+
+  // Update bride-name element with couple_names
+  if(data.couple_names){
+    var c=document.getElementById('bride-name');
+    if(c){
+      c.textContent=data.couple_names;
+      console.log('Updated bride-name to:', data.couple_names);
+    }
+    var d=document.getElementById('groom-name');
+    if(d){
+      d.textContent=data.couple_names;
+      console.log('Updated groom-name to:', data.couple_names);
+    }
+  }
+
+  // Also check for old bride_name field
   if(data.bride_name){var c=document.getElementById('bride-name');if(c)c.textContent=data.bride_name;var d=document.getElementById('groom-name');if(d)d.textContent=data.bride_name;}
-  if(data.couple_names){var coupleElements=document.querySelectorAll('.couple-names');coupleElements.forEach(el=>el.textContent=data.couple_names);}
+
+  if(data.couple_names){var coupleElements=document.querySelectorAll('.couple-names');coupleElements.forEach(el=>{el.textContent=data.couple_names;console.log('Updated .couple-names element');});}
   if(data.wedding_date){var e=document.querySelectorAll('.wedding-date');e.forEach(el=>el.textContent=data.wedding_date);}
   if(data.wedding_title){var weddingTitleElements=document.querySelectorAll('.wedding-title');weddingTitleElements.forEach(el=>el.textContent=data.wedding_title);}
   if(data.wedding_location){var f=document.querySelectorAll('.wedding-location');f.forEach(el=>el.textContent=data.wedding_location);}
