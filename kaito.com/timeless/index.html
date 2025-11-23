@@ -2,6 +2,9 @@
 <html lang="en-US" prefix="og: https://ogp.me/ns#">
 <head>
 	<meta charset="UTF-8">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
 	<base href="../">
 		
         <style type="text/css">
@@ -7819,6 +7822,7 @@ jQuery(document).ready(function ($) {
 // Load data from Supabase instead of JSON file
 (async function() {
     try {
+        console.log('[' + new Date().toLocaleTimeString() + '] Loading from Supabase...');
         const supabase = window.supabase.createClient(
             'https://sdcakojgzfscudadzrfg.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkY2Frb2pnemZzY3VkYWR6cmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4ODAxMjEsImV4cCI6MjA3OTQ1NjEyMX0.7r240PEhv8Skda-zqOM7o2u9PpHnFWWECKIGxoBvnP4'
@@ -7830,19 +7834,23 @@ jQuery(document).ready(function ($) {
             .single();
 
         if (error) {
-            console.log('No data in Supabase yet, using default content');
-            // Fallback to JSON if no data yet
-            fetch('../data/content.json').then(function(r){return r.json()}).then(updateContent);
+            console.error('[ERROR] Supabase error:', error);
+            console.log('[FALLBACK] Using JSON file');
+            fetch('../data/content.json?t=' + Date.now()).then(function(r){return r.json()}).then(updateContent);
             return;
         }
+
+        console.log('[SUCCESS] Data loaded from Supabase:');
+        console.log('- Couple Names:', data.couple_names);
+        console.log('- Wedding Title:', data.wedding_title);
+        console.log('- Updated At:', data.updated_at);
 
         // Use Supabase data
         updateContent(data);
 
     } catch (err) {
-        console.error('Supabase error:', err);
-        // Fallback to JSON
-        fetch('../data/content.json').then(function(r){return r.json()}).then(updateContent);
+        console.error('[CATCH] Supabase error:', err);
+        fetch('../data/content.json?t=' + Date.now()).then(function(r){return r.json()}).then(updateContent);
     }
 })();
 
