@@ -6,7 +6,35 @@
 	<meta http-equiv="Pragma" content="no-cache">
 	<meta http-equiv="Expires" content="0">
 	<base href="../">
-		
+
+	<!-- Block background images immediately before any other scripts run -->
+	<script>
+	(function() {
+		// Override MutationObserver to intercept DCE style injections
+		var originalMutationObserver = window.MutationObserver;
+		window.MutationObserver = function(callback) {
+			return new originalMutationObserver(function(mutations, observer) {
+				mutations.forEach(function(mutation) {
+					if (mutation.addedNodes) {
+						mutation.addedNodes.forEach(function(node) {
+							// Remove any DCE template fix styles that contain background images
+							if (node.tagName === 'STYLE' && node.id && node.id.startsWith('dce-template-fix-')) {
+								if (node.innerHTML.includes('background-image:') || node.innerHTML.includes('background:')) {
+									node.remove();
+									console.log('🚫 Blocked DCE style injection:', node.id);
+								}
+							}
+						});
+					}
+				});
+				return callback(mutations, observer);
+			});
+		};
+		window.MutationObserver.prototype = originalMutationObserver.prototype;
+		console.log('✅ Background image blocker installed');
+	})();
+	</script>
+
         <style type="text/css">
 
             .wdp-comment-text img {
@@ -22,8 +50,38 @@
             #preloader.preloader-page { display: none !important; }
             .loading-text { display: none !important; }
 
-            /* Hide all background sections until database content is loaded */
+            /* FORCE remove all background images until database content is loaded */
             /* This prevents flash of old hardcoded images */
+            .background-section-1,
+            .background-section-1 *,
+            .background-section-2,
+            .background-section-2 *,
+            .background-section-3,
+            .background-section-3 *,
+            .background-section-5,
+            .background-section-5 *,
+            .elementor-element-5de39555,
+            .elementor-element-5de39555 *,
+            .elementor-element-5de39555::before,
+            .elementor-element-84b6401,
+            .elementor-element-84b6401 *,
+            .elementor-element-0892a8b,
+            .elementor-element-0892a8b *,
+            .elementor-element-40fa890d,
+            .elementor-element-40fa890d *,
+            .elementor-element-2e297329,
+            .elementor-element-2e297329 *,
+            .elementor-element-1ae512c4,
+            .elementor-element-1ae512c4 *,
+            .elementor-element-c53800f,
+            .elementor-element-c53800f *,
+            .elementor-element-303ad26d,
+            .elementor-element-303ad26d * {
+                background-image: none !important;
+                background: transparent !important;
+            }
+
+            /* Hide sections with opacity until loaded */
             .background-section-1,
             .background-section-2,
             .background-section-3,
@@ -34,13 +92,34 @@
                 transition: opacity 0.6s ease-in-out;
             }
 
-            /* Show sections after database content is applied */
+            /* Show sections and restore backgrounds after database content is applied */
             body.db-content-loaded .background-section-1,
+            body.db-content-loaded .background-section-1 *,
             body.db-content-loaded .background-section-2,
+            body.db-content-loaded .background-section-2 *,
             body.db-content-loaded .background-section-3,
+            body.db-content-loaded .background-section-3 *,
             body.db-content-loaded .background-section-5,
+            body.db-content-loaded .background-section-5 *,
             body.db-content-loaded .elementor-element-5de39555,
-            body.db-content-loaded .elementor-element-84b6401 {
+            body.db-content-loaded .elementor-element-5de39555 *,
+            body.db-content-loaded .elementor-element-5de39555::before,
+            body.db-content-loaded .elementor-element-84b6401,
+            body.db-content-loaded .elementor-element-84b6401 *,
+            body.db-content-loaded .elementor-element-0892a8b,
+            body.db-content-loaded .elementor-element-0892a8b *,
+            body.db-content-loaded .elementor-element-40fa890d,
+            body.db-content-loaded .elementor-element-40fa890d *,
+            body.db-content-loaded .elementor-element-2e297329,
+            body.db-content-loaded .elementor-element-2e297329 *,
+            body.db-content-loaded .elementor-element-1ae512c4,
+            body.db-content-loaded .elementor-element-1ae512c4 *,
+            body.db-content-loaded .elementor-element-c53800f,
+            body.db-content-loaded .elementor-element-c53800f *,
+            body.db-content-loaded .elementor-element-303ad26d,
+            body.db-content-loaded .elementor-element-303ad26d * {
+                background: unset !important;
+                background-image: unset !important;
                 opacity: 1 !important;
             }
 
