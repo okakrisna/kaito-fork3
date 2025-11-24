@@ -24,6 +24,27 @@ Alternatif jika memiliki Node.js:
 - Fitur dinamis WordPress (PHP, admin, database) tidak aktif dalam salinan statis ini.
 - Jika ingin migrasi ke proyek statis penuh, kita bisa menyesuaikan referensi aset menjadi lokal (butuh langkah tambahan).
 
+## 💾 Database & Admin Panel
+
+Project ini sekarang menggunakan **Supabase** untuk menyimpan data dinamis.
+
+### Admin Panel
+- URL: `http://localhost:5173/admin/`
+- Bisa edit semua konten, upload gambar, dan langsung tersimpan ke database
+- Data otomatis sinkron ke halaman timeless
+
+### Setup Database Baru
+Jika pindah ke account Supabase baru, ikuti panduan lengkap di **[SUPABASE_SETUP.md](SUPABASE_SETUP.md)**
+
+**Quick Setup (5 menit):**
+1. Buka Supabase Dashboard → SQL Editor
+2. Copy-paste SQL dari file `SUPABASE_SETUP.md`
+3. Update credentials di `.env` file
+4. Update URL & anon key di `admin/index.html` dan `timeless/index.html`
+5. Done! ✅
+
+Lihat **SUPABASE_SETUP.md** untuk detail lengkap.
+
 ## Panduan Penggantian Konten (Video, Foto, Tulisan, Font)
 
 Berikut cara mengganti konten utama di halaman `timeless`.
