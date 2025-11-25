@@ -555,14 +555,15 @@
             color: var(--text-primary);
         }
 
-        .btn-delete {
-            background: var(--bg-tertiary);
-            color: var(--danger);
-            padding: 9px;
+        .btn-complete {
+            background: var(--secondary);
+            color: white;
+            padding: 8px 16px;
         }
 
-        .btn-delete:hover {
-            background: #fee2e2;
+        .btn-complete:hover {
+            background: #059669;
+            transform: translateY(-1px);
         }
 
         .bulk-toolbar {
@@ -841,7 +842,8 @@
                 document.getElementById('projects-grid').style.display = 'none';
                 document.getElementById('empty-state').style.display = 'none';
 
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?select=*&order=created_at.desc`, {
+                // Only fetch projects with status 'in_progress' (not completed)
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.in_progress&order=created_at.desc`, {
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'apikey': SUPABASE_ANON_KEY
@@ -851,6 +853,7 @@
                 if (!response.ok) throw new Error('Failed to load projects');
 
                 allProjects = await response.json();
+                console.log('Dashboard loaded projects (in_progress only):', allProjects);
                 filteredProjects = allProjects;
 
                 updateStats();
@@ -931,8 +934,8 @@
                             <button class="btn btn-sm btn-preview" onclick="previewProject('${project.slug}', '${project.template_name || 'timeless'}')">
                                 👁️ Preview
                             </button>
-                            <button class="btn btn-sm btn-delete" onclick="deleteProject('${project.id}', '${project.couple_names}')">
-                                🗑️
+                            <button class="btn btn-sm btn-complete" onclick="moveToComplete('${project.id}', '${project.couple_names}')">
+                                ✅ Complete
                             </button>
                         </div>
                     </div>
@@ -1058,25 +1061,32 @@
             }
         }
 
-        async function deleteProject(id, name) {
-            if (!confirm(`Are you sure you want to delete "${name}"?\n\nThis action cannot be undone.`)) return;
+        async function moveToComplete(id, name) {
+            if (!confirm(`Mark "${name}" as completed?\n\nThis will move the project to Orders page.`)) return;
 
             try {
+                // Update status to 'completed' and set completed_at timestamp
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?id=eq.${id}`, {
-                    method: 'DELETE',
+                    method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'apikey': SUPABASE_ANON_KEY
-                    }
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        status: 'completed',
+                        completed_at: new Date().toISOString()
+                    })
                 });
 
-                if (!response.ok) throw new Error('Failed to delete project');
+                if (!response.ok) throw new Error('Failed to update project status');
 
-                alert('✅ Project deleted successfully!');
+                alert('✅ Project marked as completed!');
                 loadProjects();
             } catch (error) {
-                console.error('Error deleting project:', error);
-                alert('❌ Error deleting project. Please try again.');
+                console.error('Error updating project:', error);
+                alert('❌ Error updating project. Please try again.');
             }
         }
 

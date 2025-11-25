@@ -725,14 +725,15 @@
         // Supabase Configuration
         const SUPABASE_URL = 'https://fnewihswvgtgzzsfaeis.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZXdpaHN3dmd0Z3p6c2ZhZWlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0MzM4ODcsImV4cCI6MjA0ODAwOTg4N30.h91m6AZqLCtQJYwXvp-EQPOlGVLptAQ4_YJTYGHqFgw';
-        const REST_API_URL = `${SUPABASE_URL}/rest/v1/orders`;
+        const TIMELESS_API_URL = `${SUPABASE_URL}/rest/v1/timeless_content`;
 
         let allOrders = [];
 
         // Load orders on page load
         async function loadOrders() {
             try {
-                const response = await fetch(`${REST_API_URL}?select=*&order=created_at.desc`, {
+                // Fetch projects from timeless_content with status 'in_progress' or 'completed'
+                const response = await fetch(`${TIMELESS_API_URL}?select=*&status=in.("in_progress","completed")&order=created_at.desc`, {
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'apikey': SUPABASE_ANON_KEY
@@ -744,7 +745,16 @@
                 }
 
                 allOrders = await response.json();
-                console.log('Orders loaded:', allOrders);
+                console.log('Orders loaded from timeless_content:', allOrders);
+
+                // Transform status: map 'in_progress' to 'in-progress' for UI
+                allOrders = allOrders.map(order => ({
+                    ...order,
+                    status: order.status === 'in_progress' ? 'in-progress' : order.status,
+                    // Use couple_names as the main identifier
+                    customer_name: order.couple_names || 'Unnamed',
+                    order_number: order.slug || order.id.substring(0, 8)
+                }));
 
                 renderOrders(allOrders);
             } catch (error) {
