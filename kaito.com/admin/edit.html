@@ -406,13 +406,12 @@
         <div class="sidebar-header">
             <h2 id="page-title">✨ Edit Project</h2>
             <p id="page-subtitle">Loading...</p>
+            <div style="margin-top: 12px; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--primary); display: none;" id="template-badge">
+                <span id="template-name-display"></span>
+            </div>
         </div>
         <nav class="sidebar-nav">
-            <div class="nav-item active" onclick="showSection('template')">
-                <span class="nav-item-icon">🎨</span>
-                <span>Template</span>
-            </div>
-            <div class="nav-item" onclick="showSection('basic')">
+            <div class="nav-item active" onclick="showSection('basic')">
                 <span class="nav-item-icon">📝</span>
                 <span>Basic Information</span>
             </div>
@@ -450,30 +449,11 @@
 
         <div class="container">
             <div id="alert" class="alert"></div>
-            <!-- Section: Template -->
-            <div class="section-content active" id="section-template">
-                <div class="section-header">
-                    <h1>Template Selection</h1>
-                    <p>Choose the design template for your wedding invitation</p>
-                </div>
-
-                <div class="card">
-                    <div class="form-group">
-                        <label>Choose Template</label>
-                        <select id="template_name">
-                            <option value="timeless">Timeless - Modern & Elegant</option>
-                            <option value="elegant">Elegant - Classic & Sophisticated</option>
-                        </select>
-                    </div>
-                    <div class="preview-container">
-                        <a href="../timeless/index.html" target="_blank" id="preview-timeless" class="btn btn-secondary">👀 Preview Timeless</a>
-                        <a href="../elegant/index.html" target="_blank" id="preview-elegant" class="btn btn-secondary">👀 Preview Elegant</a>
-                    </div>
-                </div>
-            </div>
+            <!-- Template field (hidden, for data integrity) -->
+            <input type="hidden" id="template_name">
 
             <!-- Section: Basic Information -->
-            <div class="section-content" id="section-basic">
+            <div class="section-content active" id="section-basic">
                 <div class="section-header">
                     <h1>Basic Information</h1>
                     <p>Enter the couple's details and wedding information</p>
@@ -823,8 +803,15 @@
                 const templateLabel = data.template_name === 'elegant' ? 'Elegant' : 'Timeless';
                 document.getElementById('page-subtitle').innerHTML = `
                     Editing: <strong>${data.couple_names || 'Unnamed'}</strong>
-                    (${data.slug}) | Template: <strong>${templateLabel}</strong>
                 `;
+
+                // Show template badge in sidebar
+                const templateBadge = document.getElementById('template-badge');
+                const templateDisplay = document.getElementById('template-name-display');
+                if (data.template_name) {
+                    templateDisplay.textContent = '🎨 ' + templateLabel.toUpperCase() + ' TEMPLATE';
+                    templateBadge.style.display = 'block';
+                }
 
                 // Fill form with data
                 fillFormData(data);
