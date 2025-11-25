@@ -891,8 +891,8 @@
         }
 
         function createTemplate(orderId) {
-            // Redirect to create page with order data pre-filled
-            window.location.href = `create.html?order_id=${orderId}`;
+            // Redirect to edit page to create template from order data
+            window.location.href = `edit.html?id=${orderId}`;
         }
 
         function editTemplate(orderId) {
