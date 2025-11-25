@@ -920,9 +920,18 @@
                 const result = await response.json();
                 const projectId = result[0].id;
 
+                console.log('✅ Project created with ID:', projectId);
+                console.log('🔄 Will redirect to:', `edit.html?id=${projectId}`);
+
                 showAlert('✅ Project created successfully!', 'success');
 
                 setTimeout(() => {
+                    // Clear localStorage before redirect to force fresh load
+                    localStorage.removeItem('editProjectId');
+                    console.log('🗑️ Cleared localStorage');
+                    console.log('🚀 Redirecting now...');
+
+                    // Force full page reload with new ID
                     window.location.href = `edit.html?id=${projectId}`;
                 }, 1500);
 

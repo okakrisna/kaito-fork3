@@ -871,7 +871,10 @@
         async function loadData() {
             try {
                 console.log('=== LOADING PROJECT DATA ===');
+                console.log('Current URL:', window.location.href);
+                console.log('URL Search:', window.location.search);
                 console.log('PROJECT_ID:', PROJECT_ID);
+                console.log('Type:', typeof PROJECT_ID);
 
                 let data = null;
 
@@ -937,6 +940,7 @@
                 const templateEmoji = data.template_name === 'elegant' ? '✨' : '⏱️';
                 document.getElementById('page-subtitle').innerHTML = `
                     Editing: <strong>${data.couple_names || 'Unnamed'}</strong> - ${templateEmoji} ${templateLabel}
+                    <span style="opacity: 0.5; font-size: 0.8em; margin-left: 10px;">(ID: ${PROJECT_ID})</span>
                 `;
 
                 // Show template badge in sidebar
