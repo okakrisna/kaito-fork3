@@ -848,21 +848,39 @@
         // Load data saat halaman dibuka
         async function loadData() {
             try {
+                // Build API URL
+                const apiUrl = `${REST_API_URL}?id=eq.${PROJECT_ID}&select=*`;
+
+                console.log('=== LOADING PROJECT DATA ===');
+                console.log('PROJECT_ID:', PROJECT_ID);
+                console.log('API URL:', apiUrl);
+                console.log('REST_API_URL:', REST_API_URL);
+
                 // Load specific project by ID
-                const response = await fetch(`${REST_API_URL}?id=eq.${PROJECT_ID}&select=*`, {
+                const response = await fetch(apiUrl, {
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'apikey': SUPABASE_ANON_KEY
                     }
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
                 if (!response.ok) {
-                    throw new Error(`Failed to load project: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('Response error:', errorText);
+                    throw new Error(`Failed to load project: ${response.status} - ${errorText}`);
                 }
 
                 const results = await response.json();
 
+                console.log('Results received:', results);
+                console.log('Results length:', results.length);
+                console.log('Results type:', Array.isArray(results) ? 'array' : typeof results);
+
                 if (!results || results.length === 0) {
+                    console.error('No results found for PROJECT_ID:', PROJECT_ID);
                     alert('❌ Project not found. Redirecting to dashboard...');
                     window.location.href = 'dashboard.html';
                     return;
@@ -870,6 +888,9 @@
 
                 const data = results[0];
                 currentProject = data;
+
+                console.log('Project loaded successfully:', data);
+                console.log('Couple names:', data.couple_names);
 
                 // Update page subtitle with project info
                 const templateLabel = data.template_name === 'elegant' ? 'Elegant' : 'Timeless';
