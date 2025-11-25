@@ -250,9 +250,15 @@
         /* Kanban Board */
         .kanban-board {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-bottom: 40px;
+        }
+
+        @media (max-width: 1200px) {
+            .kanban-board {
+                grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            }
         }
 
         .kanban-column {
@@ -314,14 +320,6 @@
 
         .kanban-column.in-progress .column-count {
             background: #2563eb;
-        }
-
-        .kanban-column.review .column-icon {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-        }
-
-        .kanban-column.review .column-count {
-            background: #ea580c;
         }
 
         .kanban-column.completed .column-icon {
@@ -613,9 +611,9 @@
                     <a href="dashboard.html" class="btn btn-secondary">
                         ← Back to Dashboard
                     </a>
-                    <button class="btn btn-primary" onclick="window.location.href='create.html'">
+                    <a href="dashboard.html" class="btn btn-primary">
                         + Create New Order
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -663,8 +661,8 @@
                 <div id="column-pending">
                     <div class="loading">Loading...</div>
                 </div>
-                <button class="add-card-btn" onclick="window.location.href='create.html'">
-                    + Add Order
+                <button class="add-card-btn" onclick="window.location.href='dashboard.html'">
+                    + Create New Order
                 </button>
             </div>
 
@@ -678,20 +676,6 @@
                     <span class="column-count" id="count-in-progress">0</span>
                 </div>
                 <div id="column-in-progress">
-                    <div class="loading">Loading...</div>
-                </div>
-            </div>
-
-            <!-- Review Column -->
-            <div class="kanban-column review">
-                <div class="column-header">
-                    <div class="column-title">
-                        <div class="column-icon">👀</div>
-                        <span>In Review</span>
-                    </div>
-                    <span class="column-count" id="count-review">0</span>
-                </div>
-                <div id="column-review">
                     <div class="loading">Loading...</div>
                 </div>
             </div>
@@ -746,7 +730,7 @@
 
         function renderOrders(orders) {
             // Clear all columns
-            const columns = ['pending', 'in-progress', 'review', 'completed'];
+            const columns = ['pending', 'in-progress', 'completed'];
             columns.forEach(status => {
                 document.getElementById(`column-${status}`).innerHTML = '';
             });
@@ -755,7 +739,6 @@
             const groupedOrders = {
                 'pending': [],
                 'in-progress': [],
-                'review': [],
                 'completed': []
             };
 
@@ -853,7 +836,7 @@
         }
 
         function showEmptyState() {
-            const columns = ['pending', 'in-progress', 'review', 'completed'];
+            const columns = ['pending', 'in-progress', 'completed'];
             columns.forEach(status => {
                 document.getElementById(`column-${status}`).innerHTML = `
                     <div class="empty-state">
