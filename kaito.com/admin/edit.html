@@ -714,7 +714,9 @@
         }
 
         const REST_API_URL = `${SUPABASE_URL}/rest/v1/timeless_content`;
+        const ORDERS_API_URL = `${SUPABASE_URL}/rest/v1/orders`;
         let currentProject = null;
+        let isFromOrder = false;
 
         // Debug logging
         console.log('=== EDIT PAGE DEBUG ===');
@@ -848,39 +850,49 @@
         // Load data saat halaman dibuka
         async function loadData() {
             try {
-                // Build API URL
-                const apiUrl = `${REST_API_URL}?id=eq.${PROJECT_ID}&select=*`;
-
                 console.log('=== LOADING PROJECT DATA ===');
                 console.log('PROJECT_ID:', PROJECT_ID);
-                console.log('API URL:', apiUrl);
-                console.log('REST_API_URL:', REST_API_URL);
 
-                // Load specific project by ID
-                const response = await fetch(apiUrl, {
+                let data = null;
+
+                // First try loading from timeless_content
+                const contentUrl = `${REST_API_URL}?id=eq.${PROJECT_ID}&select=*`;
+                console.log('Trying timeless_content:', contentUrl);
+
+                let response = await fetch(contentUrl, {
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'apikey': SUPABASE_ANON_KEY
                     }
                 });
 
-                console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
+                let results = await response.json();
+                console.log('Timeless content results:', results);
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Response error:', errorText);
-                    throw new Error(`Failed to load project: ${response.status} - ${errorText}`);
+                // If not found in timeless_content, try orders table
+                if (!results || results.length === 0) {
+                    console.log('Not found in timeless_content, trying orders table...');
+                    const ordersUrl = `${ORDERS_API_URL}?id=eq.${PROJECT_ID}&select=*`;
+                    console.log('Trying orders:', ordersUrl);
+
+                    response = await fetch(ordersUrl, {
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY
+                        }
+                    });
+
+                    results = await response.json();
+                    console.log('Orders results:', results);
+
+                    if (results && results.length > 0) {
+                        isFromOrder = true;
+                        console.log('✅ Found in orders table!');
+                    }
                 }
 
-                const results = await response.json();
-
-                console.log('Results received:', results);
-                console.log('Results length:', results.length);
-                console.log('Results type:', Array.isArray(results) ? 'array' : typeof results);
-
                 if (!results || results.length === 0) {
-                    console.error('No results found for PROJECT_ID:', PROJECT_ID);
+                    console.error('No results found in both tables for PROJECT_ID:', PROJECT_ID);
                     alert('❌ Project not found. Redirecting to dashboard...');
                     window.location.href = 'dashboard.html';
                     return;
