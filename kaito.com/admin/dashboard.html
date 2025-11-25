@@ -944,15 +944,25 @@
             console.log('=== EDIT PROJECT CALLED ===');
             console.log('ID received:', id);
             console.log('Type:', typeof id);
+            console.log('ID stringified:', String(id));
 
-            if (!id || id === 'undefined' || id === 'null') {
+            // Convert to string and validate
+            const cleanId = String(id).trim();
+
+            if (!cleanId || cleanId === 'undefined' || cleanId === 'null' || cleanId === '') {
                 alert('Error: Invalid project ID');
                 console.error('Invalid ID!');
                 return;
             }
-            localStorage.setItem('editProjectId', id);
-            const editUrl = `edit.html?id=${id}`;
-            console.log('Navigating to:', editUrl);
+
+            // Store in localStorage
+            localStorage.setItem('editProjectId', cleanId);
+
+            // Create clean URL with encoded ID
+            const editUrl = `edit.html?id=${encodeURIComponent(cleanId)}`;
+            console.log('Clean URL:', editUrl);
+
+            // Navigate
             window.location.href = editUrl;
         }
 

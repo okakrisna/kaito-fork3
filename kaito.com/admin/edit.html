@@ -706,7 +706,13 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZXdpaHN3dmd0Z3p6c2ZhZWlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NzAwNzcsImV4cCI6MjA3OTU0NjA3N30.0OiXAfBDe5qGw8us5i9rjfNR75XdS0RlFojhy_RhKsY';
         
         const urlParams = new URLSearchParams(window.location.search);
-        const PROJECT_ID = urlParams.get('id');
+        let PROJECT_ID = urlParams.get('id');
+
+        // Decode and clean the ID
+        if (PROJECT_ID) {
+            PROJECT_ID = decodeURIComponent(PROJECT_ID).trim();
+        }
+
         const REST_API_URL = `${SUPABASE_URL}/rest/v1/timeless_content`;
         let currentProject = null;
 
@@ -714,8 +720,18 @@
         console.log('=== EDIT PAGE DEBUG ===');
         console.log('Full URL:', window.location.href);
         console.log('Search params:', window.location.search);
-        console.log('PROJECT_ID:', PROJECT_ID);
+        console.log('Raw PROJECT_ID:', urlParams.get('id'));
+        console.log('Decoded PROJECT_ID:', PROJECT_ID);
         console.log('Type of PROJECT_ID:', typeof PROJECT_ID);
+
+        // Try to get from localStorage as fallback
+        if (!PROJECT_ID) {
+            const storedId = localStorage.getItem('editProjectId');
+            if (storedId) {
+                console.log('Using ID from localStorage:', storedId);
+                PROJECT_ID = storedId;
+            }
+        }
 
         // Section Navigation
         function showSection(sectionName, clickedElement) {
@@ -1169,9 +1185,12 @@
             console.log('PROJECT_ID:', PROJECT_ID);
 
             // Check if PROJECT_ID is provided
-            if (!PROJECT_ID) {
+            if (!PROJECT_ID || PROJECT_ID === 'null' || PROJECT_ID === 'undefined') {
                 const currentUrl = window.location.href;
-                console.error('No project ID in URL:', currentUrl);
+                const storedId = localStorage.getItem('editProjectId');
+                console.error('No valid project ID!');
+                console.error('URL:', currentUrl);
+                console.error('Stored ID:', storedId);
 
                 // Show error message with more details
                 document.body.innerHTML = `
