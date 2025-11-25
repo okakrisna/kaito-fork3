@@ -419,23 +419,23 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <div class="nav-item active" data-section="basic">
+            <div class="nav-item active" data-section="basic" onclick="showSection('basic', this)">
                 <span class="nav-item-icon">📝</span>
                 <span>Basic Information</span>
             </div>
-            <div class="nav-item" data-section="venue">
+            <div class="nav-item" data-section="venue" onclick="showSection('venue', this)">
                 <span class="nav-item-icon">📍</span>
                 <span>Venue Details</span>
             </div>
-            <div class="nav-item" data-section="photos">
+            <div class="nav-item" data-section="photos" onclick="showSection('photos', this)">
                 <span class="nav-item-icon">📸</span>
                 <span>Photos</span>
             </div>
-            <div class="nav-item" data-section="gallery">
+            <div class="nav-item" data-section="gallery" onclick="showSection('gallery', this)">
                 <span class="nav-item-icon">🖼️</span>
                 <span>Gallery</span>
             </div>
-            <div class="nav-item" data-section="settings">
+            <div class="nav-item" data-section="settings" onclick="showSection('settings', this)">
                 <span class="nav-item-icon">⚙️</span>
                 <span>Settings</span>
             </div>
@@ -741,6 +741,10 @@
 
         // Section Navigation
         function showSection(sectionName, clickedElement) {
+            console.log('🔵 showSection called!');
+            console.log('  Section name:', sectionName);
+            console.log('  Clicked element:', clickedElement);
+
             // Hide all sections
             document.querySelectorAll('.section-content').forEach(section => {
                 section.classList.remove('active');
@@ -752,11 +756,19 @@
             });
 
             // Show selected section
-            document.getElementById('section-' + sectionName).classList.add('active');
+            const targetSection = document.getElementById('section-' + sectionName);
+            console.log('  Target section:', targetSection);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                console.log('  ✅ Section activated:', sectionName);
+            } else {
+                console.error('  ❌ Section not found:', 'section-' + sectionName);
+            }
 
             // Set active nav item
             if (clickedElement) {
                 clickedElement.classList.add('active');
+                console.log('  ✅ Nav item activated');
             }
 
             // Scroll to top
