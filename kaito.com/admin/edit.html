@@ -903,19 +903,33 @@
 
                 console.log('Project loaded successfully:', data);
                 console.log('Couple names:', data.couple_names);
+                console.log('Template name:', data.template_name);
+                console.log('Is from order:', isFromOrder);
+
+                // Ensure template_name has a default value
+                if (!data.template_name) {
+                    data.template_name = 'timeless'; // Default template
+                    console.log('No template specified, using default: timeless');
+                }
 
                 // Update page subtitle with project info
                 const templateLabel = data.template_name === 'elegant' ? 'Elegant' : 'Timeless';
+                const templateEmoji = data.template_name === 'elegant' ? '✨' : '⏱️';
                 document.getElementById('page-subtitle').innerHTML = `
-                    Editing: <strong>${data.couple_names || 'Unnamed'}</strong>
+                    Editing: <strong>${data.couple_names || 'Unnamed'}</strong> - ${templateEmoji} ${templateLabel}
                 `;
 
                 // Show template badge in sidebar
                 const templateBadge = document.getElementById('template-badge');
                 const templateDisplay = document.getElementById('template-name-display');
-                if (data.template_name) {
-                    templateDisplay.textContent = '🎨 ' + templateLabel.toUpperCase() + ' TEMPLATE';
-                    templateBadge.style.display = 'block';
+                templateDisplay.textContent = '🎨 ' + templateLabel.toUpperCase() + ' TEMPLATE';
+                templateBadge.style.display = 'block';
+
+                // Set template_name hidden field BEFORE filling form
+                const templateInput = document.getElementById('template_name');
+                if (templateInput) {
+                    templateInput.value = data.template_name;
+                    console.log('Set template_name field to:', data.template_name);
                 }
 
                 // Fill form with data
