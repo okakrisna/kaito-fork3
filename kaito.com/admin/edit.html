@@ -916,73 +916,129 @@
             }
         }
 
+        // Safe element setter helper
+        function safeSetValue(id, value, defaultValue = '') {
+            const elem = document.getElementById(id);
+            if (elem) {
+                if (elem.type === 'checkbox') {
+                    elem.checked = value || false;
+                } else {
+                    elem.value = value || defaultValue;
+                }
+                return true;
+            } else {
+                console.warn(`⚠️ Element not found: ${id}`);
+                return false;
+            }
+        }
+
+        function safeSetHTML(id, html) {
+            const elem = document.getElementById(id);
+            if (elem) {
+                elem.innerHTML = html;
+                return true;
+            }
+            return false;
+        }
+
+        function safeSetAttribute(id, attr, value) {
+            const elem = document.getElementById(id);
+            if (elem) {
+                elem[attr] = value;
+                return true;
+            }
+            return false;
+        }
+
         // Helper function to fill form with data
         function fillFormData(data) {
-            if (data) {
-                    // Template selection
-                    document.getElementById('template_name').value = data.template_name || 'timeless';
+            console.log('=== FILLING FORM DATA ===');
+            console.log('Data:', data);
 
-                    // Update preview links with slug
-                    document.getElementById('preview-timeless').href = `../timeless/?slug=${data.slug}`;
-                    document.getElementById('preview-elegant').href = `../elegant/?slug=${data.slug}`;
+            if (!data) {
+                console.error('No data provided to fillFormData');
+                return;
+            }
 
-                    // Security & Privacy
-                    document.getElementById('password_protected').checked = data.password_protected || false;
-                    document.getElementById('invitation_password').value = data.invitation_password || '';
-                    document.getElementById('is_published').checked = data.is_published !== false;
+            try {
+                // Template selection
+                safeSetValue('template_name', data.template_name, 'timeless');
 
-                    // Toggle password field visibility
-                    document.getElementById('password-field').style.display = data.password_protected ? 'block' : 'none';
+                // Update preview links with slug
+                safeSetAttribute('preview-timeless', 'href', `../timeless/?slug=${data.slug}`);
+                safeSetAttribute('preview-elegant', 'href', `../elegant/?slug=${data.slug}`);
 
-                    // Analytics
-                    document.getElementById('stat-views').textContent = data.views_count || 0;
-                    document.getElementById('stat-rsvp').textContent = data.rsvp_count || 0;
-                    document.getElementById('stat-last-viewed').textContent = data.last_viewed_at
-                        ? new Date(data.last_viewed_at).toLocaleString()
-                        : 'Never';
+                // Security & Privacy
+                safeSetValue('password_protected', data.password_protected);
+                safeSetValue('invitation_password', data.invitation_password);
+                safeSetValue('is_published', data.is_published !== false);
 
-                    document.getElementById('couple_names').value = data.couple_names || '';
-                    document.getElementById('groom_full_name').value = data.groom_full_name || '';
-                    document.getElementById('bride_full_name').value = data.bride_full_name || '';
-                    document.getElementById('wedding_title').value = data.wedding_title || data.hero_title || '';
-                    document.getElementById('wedding_date').value = data.wedding_date || '';
-                    document.getElementById('venue_name').value = data.venue_name || data.wedding_location || '';
-                    document.getElementById('venue_address').value = data.venue_address || '';
-                    document.getElementById('venue_maps').value = data.venue_maps || '';
-                    document.getElementById('ceremony_time').value = data.ceremony_time || '';
-                    document.getElementById('reception_time').value = data.reception_time || '';
-                    document.getElementById('thank_you_message').value = data.thank_you_message || data.thanks_text || '';
+                // Toggle password field visibility
+                const passwordField = document.getElementById('password-field');
+                if (passwordField) {
+                    passwordField.style.display = data.password_protected ? 'block' : 'none';
+                }
 
-                    // Set hidden inputs
-                    document.getElementById('background_image').value = data.background_section_1 || data.background_image || '';
-                    document.getElementById('groom_photo').value = data.background_section_2 || data.groom_photo || '';
-                    document.getElementById('bride_photo').value = data.background_section_3 || data.bride_photo || '';
-                    document.getElementById('hero_image').value = data.hero_background_image || data.hero_image || '';
-                    document.getElementById('livestreaming_image').value = data.livestreaming_image || '';
-                    document.getElementById('thank_you_message').value = data.thank_you_message || '';
+                // Analytics
+                safeSetHTML('stat-views', data.views_count || 0);
+                safeSetHTML('stat-rsvp', data.rsvp_count || 0);
+                safeSetHTML('stat-last-viewed', data.last_viewed_at
+                    ? new Date(data.last_viewed_at).toLocaleString()
+                    : 'Never');
 
-                    // Show existing images
-                    if (data.background_section_1 || data.background_image) {
-                        const bgImageSrc = data.background_section_1 || data.background_image;
-                        document.getElementById('background_image_preview').innerHTML = `<img src="${bgImageSrc}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">`;
-                    }
-                    if (data.background_section_2 || data.groom_photo) {
-                        const groomPhotoSrc = data.background_section_2 || data.groom_photo;
-                        document.getElementById('groom_photo_preview').innerHTML = `<img src="${groomPhotoSrc}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">`;
-                    }
-                    if (data.background_section_3 || data.bride_photo) {
-                        const bridePhotoSrc = data.background_section_3 || data.bride_photo;
-                        document.getElementById('bride_photo_preview').innerHTML = `<img src="${bridePhotoSrc}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">`;
-                    }
-                    if (data.hero_background_image || data.hero_image) {
-                        const heroImageSrc = data.hero_background_image || data.hero_image;
-                        document.getElementById('hero_image_preview').innerHTML = `<img src="${heroImageSrc}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">`;
-                    }
-                    if (data.livestreaming_image) {
-                        document.getElementById('livestreaming_image_preview').innerHTML = `<img src="${data.livestreaming_image}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">`;
-                    }
-                    if (data.gallery_images && data.gallery_images.length > 0) {
-                        const galleryPreview = document.getElementById('gallery_images_preview');
+                // Basic Information
+                safeSetValue('couple_names', data.couple_names);
+                safeSetValue('groom_full_name', data.groom_full_name);
+                safeSetValue('bride_full_name', data.bride_full_name);
+                safeSetValue('wedding_title', data.wedding_title || data.hero_title);
+                safeSetValue('wedding_date', data.wedding_date);
+
+                // Venue Details
+                safeSetValue('venue_name', data.venue_name || data.wedding_location);
+                safeSetValue('venue_address', data.venue_address);
+                safeSetValue('venue_maps', data.venue_maps);
+                safeSetValue('ceremony_time', data.ceremony_time);
+                safeSetValue('reception_time', data.reception_time);
+                safeSetValue('thank_you_message', data.thank_you_message || data.thanks_text);
+
+                // Photos - Set hidden inputs
+                safeSetValue('background_image', data.background_section_1 || data.background_image);
+                safeSetValue('groom_photo', data.background_section_2 || data.groom_photo);
+                safeSetValue('bride_photo', data.background_section_3 || data.bride_photo);
+                safeSetValue('hero_image', data.hero_background_image || data.hero_image);
+                safeSetValue('livestreaming_image', data.livestreaming_image);
+
+                // Show existing images
+                const imageStyle = 'max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;';
+
+                if (data.background_section_1 || data.background_image) {
+                    const bgImageSrc = data.background_section_1 || data.background_image;
+                    safeSetHTML('background_image_preview', `<img src="${bgImageSrc}" style="${imageStyle}">`);
+                }
+
+                if (data.background_section_2 || data.groom_photo) {
+                    const groomPhotoSrc = data.background_section_2 || data.groom_photo;
+                    safeSetHTML('groom_photo_preview', `<img src="${groomPhotoSrc}" style="${imageStyle}">`);
+                }
+
+                if (data.background_section_3 || data.bride_photo) {
+                    const bridePhotoSrc = data.background_section_3 || data.bride_photo;
+                    safeSetHTML('bride_photo_preview', `<img src="${bridePhotoSrc}" style="${imageStyle}">`);
+                }
+
+                if (data.hero_background_image || data.hero_image) {
+                    const heroImageSrc = data.hero_background_image || data.hero_image;
+                    safeSetHTML('hero_image_preview', `<img src="${heroImageSrc}" style="${imageStyle}">`);
+                }
+
+                if (data.livestreaming_image) {
+                    safeSetHTML('livestreaming_image_preview', `<img src="${data.livestreaming_image}" style="${imageStyle}">`);
+                }
+
+                // Gallery images
+                if (data.gallery_images && data.gallery_images.length > 0) {
+                    const galleryPreview = document.getElementById('gallery_images_preview');
+                    if (galleryPreview) {
                         galleryPreview.innerHTML = '';
                         data.gallery_images.forEach(url => {
                             const div = document.createElement('div');
@@ -990,8 +1046,14 @@
                             galleryPreview.appendChild(div);
                         });
                     }
+                }
 
-                    console.log('Data berhasil dimuat!');
+                    console.log('✅ Data berhasil dimuat!');
+            } catch (error) {
+                console.error('❌ Error in fillFormData:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                throw error; // Re-throw to be caught by loadData
             }
         }
 
