@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Analytics - Wedding Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -14,7 +13,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f5f7fa;
             min-height: 100vh;
         }
@@ -54,7 +53,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
@@ -107,7 +106,7 @@
 
         .stat-icon.blue { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
         .stat-icon.green { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
-        .stat-icon.purple { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+        .stat-icon.purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .stat-icon.pink { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
 
         .stat-content h3 {
@@ -161,7 +160,7 @@
         .date-filters input:focus,
         .date-filters select:focus {
             outline: none;
-            border-color: #0ea5e9;
+            border-color: #667eea;
         }
 
         .chart-container {
@@ -218,7 +217,7 @@
 
         .template-badge.timeless {
             background: #e0e7ff;
-            color: #0ea5e9;
+            color: #667eea;
         }
 
         .template-badge.elegant {
@@ -251,13 +250,13 @@
         }
 
         .filter-chip.active {
-            background: #0ea5e9;
+            background: #667eea;
             color: white;
-            border-color: #0ea5e9;
+            border-color: #667eea;
         }
 
         .filter-chip:hover {
-            border-color: #0ea5e9;
+            border-color: #667eea;
         }
 
         @media (max-width: 768px) {
@@ -432,7 +431,7 @@
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button type="button" onclick="closeAddSaleModal()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #e2e8f0; color: #2d3748; cursor: pointer; font-weight: 600;">Cancel</button>
-                    <button type="submit" style="padding: 10px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; cursor: pointer; font-weight: 600;">Add Sale</button>
+                    <button type="submit" style="padding: 10px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; cursor: pointer; font-weight: 600;">Add Sale</button>
                 </div>
             </form>
         </div>
@@ -516,8 +515,8 @@
                     datasets: [{
                         label: 'Sales',
                         data: counts,
-                        borderColor: '#0ea5e9',
-                        backgroundColor: chartType === 'bar' ? '#0ea5e9' : 'rgba(102, 126, 234, 0.1)',
+                        borderColor: '#667eea',
+                        backgroundColor: chartType === 'bar' ? '#667eea' : 'rgba(102, 126, 234, 0.1)',
                         tension: 0.4,
                         fill: chartType === 'line'
                     }]
@@ -555,7 +554,7 @@
                     labels: ['Timeless', 'Elegant'],
                     datasets: [{
                         data: [timelessCount, elegantCount],
-                        backgroundColor: ['#0ea5e9', '#f5576c'],
+                        backgroundColor: ['#667eea', '#f5576c'],
                         borderWidth: 0
                     }]
                 },

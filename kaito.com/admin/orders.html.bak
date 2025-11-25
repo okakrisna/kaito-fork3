@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders Management - Wedding Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,7 +12,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f5f7fa;
             min-height: 100vh;
         }
@@ -56,7 +55,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
@@ -145,7 +144,7 @@
         .filters input:focus,
         .filters select:focus {
             outline: none;
-            border-color: #0ea5e9;
+            border-color: #667eea;
         }
 
         .kanban-board {
@@ -181,7 +180,7 @@
         }
 
         .column-count {
-            background: #0ea5e9;
+            background: #667eea;
             color: white;
             padding: 4px 10px;
             border-radius: 20px;
@@ -223,7 +222,7 @@
 
         .order-number {
             font-size: 11px;
-            color: #0ea5e9;
+            color: #667eea;
             font-weight: 600;
         }
 
@@ -267,7 +266,7 @@
 
         .template-badge.timeless {
             background: #e0e7ff;
-            color: #0ea5e9;
+            color: #667eea;
         }
 
         .template-badge.elegant {
@@ -308,7 +307,7 @@
         }
 
         .btn-view {
-            background: #0ea5e9;
+            background: #667eea;
             color: white;
         }
 
@@ -395,7 +394,7 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #0ea5e9;
+            border-color: #667eea;
         }
 
         .form-row {
