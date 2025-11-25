@@ -921,18 +921,20 @@
                 const projectId = result[0].id;
 
                 console.log('✅ Project created with ID:', projectId);
-                console.log('🔄 Will redirect to:', `edit.html?id=${projectId}`);
+                console.log('📝 Project data:', result[0]);
+
+                // Store in localStorage BEFORE redirect
+                localStorage.setItem('editProjectId', projectId);
+                console.log('💾 Saved to localStorage:', projectId);
 
                 showAlert('✅ Project created successfully!', 'success');
 
                 setTimeout(() => {
-                    // Clear localStorage before redirect to force fresh load
-                    localStorage.removeItem('editProjectId');
-                    console.log('🗑️ Cleared localStorage');
-                    console.log('🚀 Redirecting now...');
+                    const redirectUrl = `edit.html?id=${encodeURIComponent(projectId)}`;
+                    console.log('🚀 Redirecting to:', redirectUrl);
 
-                    // Force full page reload with new ID
-                    window.location.href = `edit.html?id=${projectId}`;
+                    // Use replace to avoid back button issues
+                    window.location.replace(redirectUrl);
                 }, 1500);
 
             } catch (error) {

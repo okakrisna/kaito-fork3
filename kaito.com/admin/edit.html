@@ -712,9 +712,15 @@
         const urlParams = new URLSearchParams(window.location.search);
         let PROJECT_ID = urlParams.get('id');
 
+        console.log('🔍 Initial PROJECT_ID:', PROJECT_ID);
+        console.log('🔍 Type:', typeof PROJECT_ID);
+        console.log('🔍 Is null:', PROJECT_ID === null);
+        console.log('🔍 Is string:', typeof PROJECT_ID === 'string');
+
         // Decode and clean the ID
         if (PROJECT_ID) {
             PROJECT_ID = decodeURIComponent(PROJECT_ID).trim();
+            console.log('✅ Cleaned PROJECT_ID:', PROJECT_ID);
         }
 
         const REST_API_URL = `${SUPABASE_URL}/rest/v1/timeless_content`;
@@ -736,6 +742,13 @@
             if (storedId) {
                 console.log('Using ID from localStorage:', storedId);
                 PROJECT_ID = storedId;
+            } else {
+                console.error('❌ No PROJECT_ID found in URL or localStorage');
+                // Show error and redirect to dashboard
+                document.getElementById('error-container').style.display = 'flex';
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 3000);
             }
         } else {
             // Update localStorage with the current PROJECT_ID from URL
