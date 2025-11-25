@@ -557,6 +557,31 @@
             font-size: 14px;
         }
 
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .info-box h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .page-header {
@@ -611,9 +636,6 @@
                     <a href="dashboard.html" class="btn btn-secondary">
                         ← Back to Dashboard
                     </a>
-                    <a href="dashboard.html" class="btn btn-primary">
-                        + Create New Order
-                    </a>
                 </div>
             </div>
         </div>
@@ -621,6 +643,12 @@
 
     <!-- Main Container -->
     <div class="container">
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>📋 How Orders Work</h3>
+            <p>Orders automatically appear in <strong>Pending</strong> when customers submit the Google Form. Click <strong>"Create Template"</strong> to start building their wedding website. Once completed, the order moves to <strong>Completed</strong> status.</p>
+        </div>
+
         <!-- Search and Filter Toolbar -->
         <div class="toolbar">
             <div class="search-box">
@@ -661,9 +689,6 @@
                 <div id="column-pending">
                     <div class="loading">Loading...</div>
                 </div>
-                <button class="add-card-btn" onclick="window.location.href='dashboard.html'">
-                    + Create New Order
-                </button>
             </div>
 
             <!-- In Progress Column -->
@@ -823,12 +848,18 @@
                 </div>
 
                 <div class="card-footer">
-                    <button class="card-action btn-view" onclick="viewOrder('${order.id}')">
-                        View
-                    </button>
-                    <button class="card-action btn-edit" onclick="editOrder('${order.id}')">
-                        Edit
-                    </button>
+                    ${order.status === 'pending' ? `
+                        <button class="card-action btn-view" onclick="createTemplate('${order.id}')">
+                            🎨 Create Template
+                        </button>
+                    ` : `
+                        <button class="card-action btn-view" onclick="viewOrder('${order.id}')">
+                            👁️ View Site
+                        </button>
+                        <button class="card-action btn-edit" onclick="editTemplate('${order.id}')">
+                            ✏️ Edit
+                        </button>
+                    `}
                 </div>
             `;
 
@@ -859,7 +890,13 @@
             }
         }
 
-        function editOrder(orderId) {
+        function createTemplate(orderId) {
+            // Redirect to create page with order data pre-filled
+            window.location.href = `create.html?order_id=${orderId}`;
+        }
+
+        function editTemplate(orderId) {
+            // Redirect to edit page
             window.location.href = `edit.html?id=${orderId}`;
         }
 
