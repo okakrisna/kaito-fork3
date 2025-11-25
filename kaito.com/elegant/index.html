@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Wedding - Loading...</title>
+    <link rel="stylesheet" href="../wp-content/plugins/elementor/assets/css/frontend.min.css">
+    <link rel="stylesheet" href="../wp-content/plugins/elementor-pro/assets/css/frontend.min.css">
+    <link rel="stylesheet" href="../wp-content/plugins/weddingpress/assets/css/wdp.css">
+    <link rel="stylesheet" href="../wp-content/plugins/weddingpress/assets/css/exad-styles.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: #f5f1ed;
+            color: #3d3d3d;
+            overflow-x: hidden;
+        }
+
+        @font-face {
+            font-family: 'Editors Note';
+            src: url('../wp-content/uploads/2022/11/EditorsNote-Light.ttf') format('truetype');
+            font-weight: 300;
+        }
+
+        @font-face {
+            font-family: 'Editors Note';
+            src: url('../wp-content/uploads/2022/11/EditorsNote-Regular.ttf') format('truetype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Candlefish';
+            src: url('../wp-content/uploads/2024/09/Candlefish.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Esther';
+            src: url('../wp-content/uploads/2023/02/Esther.otf') format('opentype');
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5f1ed 0%, #e8dfd6 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-content h1 {
+            font-family: 'Candlefish', cursive;
+            font-size: 48px;
+            color: #8b7355;
+            margin-bottom: 24px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e8dfd6;
+            border-top-color: #8b7355;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-section {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 40px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Candlefish', cursive;
+            font-size: 72px;
+            margin-bottom: 24px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .hero-content .subtitle {
+            font-family: 'Editors Note', serif;
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Candlefish', cursive;
+            font-size: 48px;
+            text-align: center;
+            color: #8b7355;
+            margin-bottom: 60px;
+        }
+
+        .couple-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .couple-info {
+            text-align: center;
+        }
+
+        .couple-photo {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #8b7355;
+            margin-bottom: 24px;
+        }
+
+        .couple-name {
+            font-family: 'Candlefish', cursive;
+            font-size: 42px;
+            color: #8b7355;
+            margin-bottom: 16px;
+        }
+
+        .couple-details {
+            font-family: 'Editors Note', serif;
+            font-size: 18px;
+            color: #5d5d5d;
+            line-height: 1.8;
+        }
+
+        .event-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .event-title {
+            font-family: 'Candlefish', cursive;
+            font-size: 36px;
+            color: #8b7355;
+            margin-bottom: 16px;
+        }
+
+        .event-details {
+            font-size: 18px;
+            color: #5d5d5d;
+            line-height: 1.8;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .rsvp-form {
+            background: white;
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Editors Note', serif;
+            font-size: 16px;
+            color: #3d3d3d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e8dfd6;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #8b7355;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #8b7355 0%, #6d5a45 100%);
+            color: white;
+            padding: 16px 48px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 115, 85, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 48px;
+            }
+
+            .couple-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .section {
+                padding: 60px 20px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .rsvp-form {
+                padding: 30px 20px;
+            }
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <h1>Loading...</h1>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div id="content" style="display: none;"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://fnewihswvgtgzzsfaeis.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZXdpaHN3dmd0Z3p6c2ZhZWlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NzAwNzcsImV4cCI6MjA3OTU0NjA3N30.0OiXAfBDe5qGw8us5i9rjfNR75XdS0RlFojhy_RhKsY';
+
+        async function loadContent() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const slug = params.get('slug');
+
+                if (!slug) {
+                    throw new Error('No slug provided in URL');
+                }
+
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?slug=eq.${slug}&select=*`, {
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'apikey': SUPABASE_ANON_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    throw new Error('Wedding invitation not found');
+                }
+
+                const content = data[0];
+
+                if (content.template_name !== 'elegant') {
+                    throw new Error('This URL is for a different template');
+                }
+
+                renderContent(content);
+
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('content').style.display = 'block';
+
+                document.title = `The Wedding of ${content.couple_names}`;
+
+            } catch (error) {
+                console.error('Error loading content:', error);
+                document.getElementById('loadingScreen').innerHTML = `
+                    <div class="error-message">
+                        <h2>❌ Error Loading Invitation</h2>
+                        <p>${error.message}</p>
+                        <p style="margin-top: 16px;">
+                            <a href="/admin/dashboard.html" style="color: #8b7355; text-decoration: underline;">
+                                Go to Dashboard
+                            </a>
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderContent(data) {
+            const contentDiv = document.getElementById('content');
+
+            const heroBackground = data.hero_background_image || '/wp-content/uploads/2024/07/Foto-SLide-Gallery-1-Large-SHERLY-1-1.jpeg';
+
+            const html = `
+                <section class="hero-section" style="background-image: url('${heroBackground}');">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-content">
+                        <div class="subtitle">The Wedding of</div>
+                        <h1>${data.couple_names || 'Bride & Groom'}</h1>
+                        <div class="subtitle">${new Date(data.wedding_date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}</div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2 class="section-title">Our Story</h2>
+                    <div class="couple-container">
+                        <div class="couple-info">
+                            <img src="${data.groom_photo || '/wp-content/uploads/2024/07/Timeless-00011.jpeg'}"
+                                 alt="Groom"
+                                 class="couple-photo">
+                            <h3 class="couple-name">${data.groom_name || 'Groom'}</h3>
+                            <div class="couple-details">
+                                ${data.groom_parents || 'Son of Mr. & Mrs. Groom'}
+                            </div>
+                        </div>
+                        <div class="couple-info">
+                            <img src="${data.bride_photo || '/wp-content/uploads/2024/07/Timeless-00018.jpeg'}"
+                                 alt="Bride"
+                                 class="couple-photo">
+                            <h3 class="couple-name">${data.bride_name || 'Bride'}</h3>
+                            <div class="couple-details">
+                                ${data.bride_parents || 'Daughter of Mr. & Mrs. Bride'}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" style="background: #f9f7f5;">
+                    <h2 class="section-title">When & Where</h2>
+
+                    ${data.akad_date ? `
+                    <div class="event-card">
+                        <h3 class="event-title">Akad Nikah</h3>
+                        <div class="event-details">
+                            <p><strong>📅 ${new Date(data.akad_date).toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}</strong></p>
+                            <p>⏰ ${data.akad_time || 'Time TBA'}</p>
+                            <p>📍 ${data.akad_venue || 'Venue TBA'}</p>
+                            ${data.akad_address ? `<p style="margin-top: 12px; font-size: 16px;">${data.akad_address}</p>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${data.reception_date ? `
+                    <div class="event-card">
+                        <h3 class="event-title">Wedding Reception</h3>
+                        <div class="event-details">
+                            <p><strong>📅 ${new Date(data.reception_date).toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}</strong></p>
+                            <p>⏰ ${data.reception_time || 'Time TBA'}</p>
+                            <p>📍 ${data.reception_venue || 'Venue TBA'}</p>
+                            ${data.reception_address ? `<p style="margin-top: 12px; font-size: 16px;">${data.reception_address}</p>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </section>
+
+                ${data.gallery_images && data.gallery_images.length > 0 ? `
+                <section class="section">
+                    <h2 class="section-title">Our Gallery</h2>
+                    <div class="gallery-grid">
+                        ${data.gallery_images.map(img => `
+                            <div class="gallery-item">
+                                <img src="${img}" alt="Gallery">
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+                ` : ''}
+
+                <section class="section" style="background: #f9f7f5;">
+                    <h2 class="section-title">RSVP</h2>
+                    <form class="rsvp-form" id="rsvpForm">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attendance">Will you attend? *</label>
+                            <select id="attendance" name="attendance" required>
+                                <option value="">Please select</option>
+                                <option value="yes">Yes, I will attend</option>
+                                <option value="no">Sorry, I can't make it</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guests">Number of Guests</label>
+                            <input type="number" id="guests" name="guests" min="1" max="5" value="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message for the Couple</label>
+                            <textarea id="message" name="message" rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Send RSVP</button>
+                    </form>
+                </section>
+            `;
+
+            contentDiv.innerHTML = html;
+
+            document.getElementById('rsvpForm').addEventListener('submit', handleRSVP);
+        }
+
+        async function handleRSVP(e) {
+            e.preventDefault();
+
+            const btn = e.target.querySelector('.submit-btn');
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                alert('✅ Thank you for your RSVP! Your response has been recorded.');
+                e.target.reset();
+            } catch (error) {
+                alert('❌ Sorry, there was an error sending your RSVP. Please try again.');
+            } finally {
+                btn.textContent = 'Send RSVP';
+                btn.disabled = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadContent);
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
   "name": "kaito-wedding",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npx serve kaito.com -p 5173"
+    "dev": "npx serve kaito.com -p 5173",
+    "build": "echo '✅ Static website - no build needed. All files ready for deployment!'"
   }
 }

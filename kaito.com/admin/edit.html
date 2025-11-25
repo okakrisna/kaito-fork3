@@ -187,6 +187,32 @@
 
         <div id="alert" class="alert"></div>
 
+        <!-- Section: Template Selection -->
+        <div class="section" style="border-left-color: #f59e0b;">
+            <h2>🎨 Template Selection</h2>
+            <div class="form-group">
+                <label>Choose Template</label>
+                <select id="template_name" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    <option value="timeless">Timeless - Modern & Elegant</option>
+                    <option value="elegant">Elegant - Classic & Sophisticated</option>
+                </select>
+                <p class="help-text">Choose the design template for your wedding invitation</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+                <div style="border: 2px solid #e0e0e0; border-radius: 8px; padding: 16px; text-align: center;">
+                    <strong style="color: #667eea;">Timeless</strong>
+                    <p style="font-size: 12px; color: #666; margin: 8px 0;">Modern design with animated elements</p>
+                    <a href="../timeless/?slug=" id="preview-timeless" target="_blank" style="font-size: 12px; color: #667eea;">Preview →</a>
+                </div>
+                <div style="border: 2px solid #e0e0e0; border-radius: 8px; padding: 16px; text-align: center;">
+                    <strong style="color: #8b7355;">Elegant</strong>
+                    <p style="font-size: 12px; color: #666; margin: 8px 0;">Classic design with sophisticated layout</p>
+                    <a href="../elegant/?slug=" id="preview-elegant" target="_blank" style="font-size: 12px; color: #8b7355;">Preview →</a>
+                </div>
+            </div>
+        </div>
+
         <!-- Section: Info Pasangan -->
         <div class="section">
             <h2>💑 Informasi Pasangan</h2>
@@ -322,6 +348,53 @@
             </div>
         </div>
 
+        <!-- Section: Security & Privacy -->
+        <div class="section" style="border-left-color: #dc2626;">
+            <h2>🔒 Security & Privacy</h2>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="password_protected" style="width: auto; margin: 0;">
+                    Enable Password Protection
+                </label>
+                <p class="help-text">Require guests to enter a password before viewing the invitation</p>
+            </div>
+
+            <div class="form-group" id="password-field" style="display: none;">
+                <label>Invitation Password</label>
+                <input type="text" id="invitation_password" placeholder="Enter password (min 4 characters)">
+                <p class="help-text">⚠️ Make sure to remember this password and share it with your guests</p>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="is_published" checked style="width: auto; margin: 0;">
+                    Publish Invitation
+                </label>
+                <p class="help-text">Uncheck to make invitation temporarily unavailable</p>
+            </div>
+        </div>
+
+        <!-- Section: Analytics & Stats -->
+        <div class="section" style="border-left-color: #10b981;">
+            <h2>📊 Analytics & Statistics</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 2px solid #e0e0e0;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Total Views</div>
+                    <div style="font-size: 28px; font-weight: 600; color: #667eea;" id="stat-views">0</div>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 2px solid #e0e0e0;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">RSVP Count</div>
+                    <div style="font-size: 28px; font-weight: 600; color: #10b981;" id="stat-rsvp">0</div>
+                </div>
+            </div>
+
+            <p style="margin-top: 16px; font-size: 14px; color: #666;">
+                <strong>Last Viewed:</strong> <span id="stat-last-viewed">Never</span>
+            </p>
+        </div>
+
         <button class="btn" onclick="saveAll()">💾 Simpan Semua Perubahan</button>
 
         <a href="#" id="preview-link" class="preview-link" target="_blank" style="display:none;">👁️ Preview</a>
@@ -397,55 +470,71 @@
         // Load data saat halaman dibuka
         async function loadData() {
             try {
-                // Try to load from REST API first
-                const response = await fetch(`${REST_API_URL}?limit=1`, {
+                // Load specific project by ID
+                const response = await fetch(`${REST_API_URL}?id=eq.${PROJECT_ID}&select=*`, {
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'apikey': SUPABASE_ANON_KEY
                     }
                 });
-                if (response.ok) {
-                    const results = await response.json();
-                    let data = results.length > 0 ? results[0] : null;
 
-                    // Fallback to JSON file if API returns no data
-                    if (!data) {
-                        try {
-                            const jsonResponse = await fetch('../data/content.json');
-                            if (jsonResponse.ok) {
-                                data = await jsonResponse.json();
-                            }
-                        } catch (e) {
-                            console.log('No existing data found');
-                            return;
-                        }
-                    }
+                if (!response.ok) {
+                    throw new Error(`Failed to load project: ${response.status}`);
+                }
 
-                    // Isi form dengan data yang ada
-                    if (data) {
-                        fillFormData(data);
-                    }
+                const results = await response.json();
+
+                if (!results || results.length === 0) {
+                    alert('❌ Project not found. Redirecting to dashboard...');
+                    window.location.href = 'dashboard.html';
                     return;
                 }
-            } catch (error) {
-                console.error('Error loading from API:', error);
-            }
 
-            // Fallback: Try to load from JSON file
-            try {
-                const response = await fetch('../data/content.json');
-                if (response.ok) {
-                    const data = await response.json();
-                    fillFormData(data);
-                }
-            } catch (e) {
-                console.log('No fallback data found');
+                const data = results[0];
+                currentProject = data;
+
+                // Update page subtitle with project info
+                const templateLabel = data.template_name === 'elegant' ? 'Elegant' : 'Timeless';
+                document.getElementById('page-subtitle').innerHTML = `
+                    Editing: <strong>${data.couple_names || 'Unnamed'}</strong>
+                    (${data.slug}) | Template: <strong>${templateLabel}</strong>
+                `;
+
+                // Fill form with data
+                fillFormData(data);
+
+            } catch (error) {
+                console.error('Error loading project:', error);
+                alert('❌ Error loading project. Please try again.');
+                window.location.href = 'dashboard.html';
             }
         }
 
         // Helper function to fill form with data
         function fillFormData(data) {
             if (data) {
+                    // Template selection
+                    document.getElementById('template_name').value = data.template_name || 'timeless';
+
+                    // Update preview links with slug
+                    document.getElementById('preview-timeless').href = `../timeless/?slug=${data.slug}`;
+                    document.getElementById('preview-elegant').href = `../elegant/?slug=${data.slug}`;
+
+                    // Security & Privacy
+                    document.getElementById('password_protected').checked = data.password_protected || false;
+                    document.getElementById('invitation_password').value = data.invitation_password || '';
+                    document.getElementById('is_published').checked = data.is_published !== false;
+
+                    // Toggle password field visibility
+                    document.getElementById('password-field').style.display = data.password_protected ? 'block' : 'none';
+
+                    // Analytics
+                    document.getElementById('stat-views').textContent = data.views_count || 0;
+                    document.getElementById('stat-rsvp').textContent = data.rsvp_count || 0;
+                    document.getElementById('stat-last-viewed').textContent = data.last_viewed_at
+                        ? new Date(data.last_viewed_at).toLocaleString()
+                        : 'Never';
+
                     document.getElementById('couple_names').value = data.couple_names || '';
                     document.getElementById('groom_full_name').value = data.groom_full_name || '';
                     document.getElementById('bride_full_name').value = data.bride_full_name || '';
@@ -560,29 +649,13 @@
 
                 btn.textContent = '💾 Menyimpan data...';
 
-                // Load existing data to preserve other fields
-                let existingData = {};
-                let existingId = null;
-                try {
-                    const response = await fetch(`${REST_API_URL}?limit=1`, {
-                        headers: {
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'apikey': SUPABASE_ANON_KEY
-                        }
-                    });
-                    if (response.ok) {
-                        const results = await response.json();
-                        if (results.length > 0) {
-                            existingData = results[0];
-                            existingId = results[0].id;
-                        }
-                    }
-                } catch (e) {
-                    console.log('No existing data, will create new');
-                }
+                // Use current project data
+                let existingData = currentProject || {};
+                let existingId = PROJECT_ID;
 
                 // Build data object with only fields that exist in database schema
                 const data = {
+                    template_name: document.getElementById('template_name').value,
                     couple_names: document.getElementById('couple_names').value,
                     groom_full_name: document.getElementById('groom_full_name').value,
                     bride_full_name: document.getElementById('bride_full_name').value,
@@ -593,7 +666,10 @@
                     venue_maps: document.getElementById('venue_maps').value,
                     ceremony_time: document.getElementById('ceremony_time').value,
                     reception_time: document.getElementById('reception_time').value,
-                    thank_you_message: document.getElementById('thank_you_message').value
+                    thank_you_message: document.getElementById('thank_you_message').value,
+                    password_protected: document.getElementById('password_protected').checked,
+                    invitation_password: document.getElementById('invitation_password').value,
+                    is_published: document.getElementById('is_published').checked
                 };
 
                 // Only update image fields if new images were uploaded, otherwise preserve existing
@@ -707,7 +783,26 @@
         }
 
         // Load data saat halaman dibuka
-        window.addEventListener('DOMContentLoaded', loadData);
+        // Toggle password field visibility
+        function initializePasswordToggle() {
+            const checkbox = document.getElementById('password_protected');
+            const passwordField = document.getElementById('password-field');
+
+            checkbox.addEventListener('change', function() {
+                passwordField.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+
+        // Check if PROJECT_ID is provided
+        if (!PROJECT_ID) {
+            alert('❌ No project ID provided. Redirecting to dashboard...');
+            window.location.href = 'dashboard.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initializePasswordToggle();
+        });
     </script>
 </body>
 </html>

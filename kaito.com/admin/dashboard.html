@@ -422,6 +422,29 @@
             </div>
         </div>
 
+        <!-- Bulk Operations Toolbar -->
+        <div id="bulk-toolbar" style="display: none; background: #f7fafc; padding: 16px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong><span id="selected-count">0</span> projects selected</strong>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="bulkPublish()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                        ✅ Publish
+                    </button>
+                    <button onclick="bulkUnpublish()" style="background: #f59e0b; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                        ⏸️ Unpublish
+                    </button>
+                    <button onclick="bulkDelete()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                        🗑️ Delete
+                    </button>
+                    <button onclick="clearSelection()" style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                        ❌ Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Projects Grid -->
         <div id="loading" class="loading">
             ⏳ Loading projects...
@@ -513,22 +536,29 @@
 
             grid.innerHTML = filteredProjects.map(project => `
                 <div class="project-card">
+                    <div style="position: absolute; top: 12px; left: 12px; z-index: 10;">
+                        <input type="checkbox" class="project-checkbox" data-project-id="${project.id}"
+                               style="width: 20px; height: 20px; cursor: pointer;"
+                               onchange="updateSelection()">
+                    </div>
                     <div class="project-thumbnail ${project.template_name || 'timeless'}">
                         <div class="template-badge">${(project.template_name || 'timeless').toUpperCase()}</div>
                         <div class="status-badge ${project.status || 'draft'}">${project.status || 'draft'}</div>
-                        💍
+                        ${project.password_protected ? '🔒' : '💍'}
+                        ${!project.is_published ? '<div style="position: absolute; bottom: 8px; right: 8px; background: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">UNPUBLISHED</div>' : ''}
                     </div>
                     <div class="project-content">
                         <h3>${project.couple_names || 'Untitled Wedding'}</h3>
                         <div class="project-meta">
                             <span>📅 ${project.wedding_date || 'No date'}</span>
                             <span>👁️ ${project.views_count || 0} views</span>
+                            ${project.rsvp_count ? `<span>💌 ${project.rsvp_count} RSVPs</span>` : ''}
                         </div>
                         <div class="project-actions">
                             <button class="btn btn-sm btn-edit" onclick="editProject('${project.id}')">
                                 ✏️ Edit
                             </button>
-                            <button class="btn btn-sm btn-preview" onclick="previewProject('${project.slug}')">
+                            <button class="btn btn-sm btn-preview" onclick="previewProject('${project.slug}', '${project.template_name || 'timeless'}')">
                                 👁️ Preview
                             </button>
                             <button class="btn btn-sm btn-delete" onclick="deleteProject('${project.id}', '${project.couple_names}')">
@@ -544,10 +574,106 @@
             window.location.href = `edit.html?id=${id}`;
         }
 
-        function previewProject(slug) {
-            // Use timeless template directly with slug parameter for now
-            // This works with simple static server (no routing needed)
-            window.open(`/timeless/?slug=${slug}`, '_blank');
+        function previewProject(slug, template) {
+            const templatePath = template === 'elegant' ? '/elegant/' : '/timeless/';
+            window.open(`${templatePath}?slug=${slug}`, '_blank');
+        }
+
+        // Bulk Operations
+        let selectedProjects = new Set();
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.project-checkbox:checked');
+            selectedProjects = new Set(Array.from(checkboxes).map(cb => cb.dataset.projectId));
+
+            const count = selectedProjects.size;
+            document.getElementById('selected-count').textContent = count;
+            document.getElementById('bulk-toolbar').style.display = count > 0 ? 'block' : 'none';
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.project-checkbox').forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        async function bulkPublish() {
+            if (selectedProjects.size === 0) return;
+
+            if (!confirm(`Publish ${selectedProjects.size} project(s)?`)) return;
+
+            try {
+                for (const projectId of selectedProjects) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?id=eq.${projectId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({ is_published: true })
+                    });
+                }
+
+                alert(`✅ Successfully published ${selectedProjects.size} project(s)!`);
+                clearSelection();
+                loadProjects();
+            } catch (error) {
+                alert('❌ Error publishing projects: ' + error.message);
+            }
+        }
+
+        async function bulkUnpublish() {
+            if (selectedProjects.size === 0) return;
+
+            if (!confirm(`Unpublish ${selectedProjects.size} project(s)?`)) return;
+
+            try {
+                for (const projectId of selectedProjects) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?id=eq.${projectId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({ is_published: false })
+                    });
+                }
+
+                alert(`✅ Successfully unpublished ${selectedProjects.size} project(s)!`);
+                clearSelection();
+                loadProjects();
+            } catch (error) {
+                alert('❌ Error unpublishing projects: ' + error.message);
+            }
+        }
+
+        async function bulkDelete() {
+            if (selectedProjects.size === 0) return;
+
+            if (!confirm(`⚠️ DELETE ${selectedProjects.size} project(s)?\n\nThis action CANNOT be undone!`)) return;
+
+            if (!confirm(`Are you absolutely sure? Type YES to confirm.`)) return;
+
+            try {
+                for (const projectId of selectedProjects) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?id=eq.${projectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY
+                        }
+                    });
+                }
+
+                alert(`✅ Successfully deleted ${selectedProjects.size} project(s)!`);
+                clearSelection();
+                loadProjects();
+            } catch (error) {
+                alert('❌ Error deleting projects: ' + error.message);
+            }
         }
 
         async function deleteProject(id, name) {
