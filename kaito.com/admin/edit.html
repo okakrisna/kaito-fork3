@@ -407,6 +407,8 @@
             }
         }
     </style>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -713,7 +715,11 @@
     <script>
         const SUPABASE_URL = 'https://fnewihswvgtgzzsfaeis.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZXdpaHN3dmd0Z3p6c2ZhZWlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NzAwNzcsImV4cCI6MjA3OTU0NjA3N30.0OiXAfBDe5qGw8us5i9rjfNR75XdS0RlFojhy_RhKsY';
-        
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client initialized');
+
         const urlParams = new URLSearchParams(window.location.search);
         let PROJECT_ID = urlParams.get('id');
 
