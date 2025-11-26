@@ -497,17 +497,36 @@
                 }
 
                 // Transform completed orders to sales format
+                console.log('Before filter - orders:', completedOrders);
+                console.log('Checking completed_at for each order:');
+                completedOrders.forEach((order, index) => {
+                    console.log(`Order ${index}:`, {
+                        id: order.id,
+                        couple_names: order.couple_names,
+                        completed_at: order.completed_at,
+                        hasCompletedAt: !!order.completed_at
+                    });
+                });
+
                 const orderSales = completedOrders
-                    .filter(order => order.completed_at) // Only include orders with completed_at
+                    .filter(order => {
+                        const hasDate = !!order.completed_at;
+                        if (!hasDate) {
+                            console.warn('Order missing completed_at:', order);
+                        }
+                        return hasDate;
+                    })
                     .map(order => ({
                         id: `order-${order.id}`,
                         template_name: order.template_name || 'timeless',
                         couple_names: order.couple_names || 'Unnamed',
                         sale_date: order.completed_at.split('T')[0], // Use completion date
-                        price: order.price || 0,
+                        price: parseFloat(order.price) || 0,
                         notes: `Auto-generated from completed order`,
                         source: 'order' // Mark as auto-generated
                     }));
+
+                console.log('After transformation - orderSales:', orderSales);
 
                 // Mark manual sales
                 const markedManualSales = manualSales.map(sale => ({
