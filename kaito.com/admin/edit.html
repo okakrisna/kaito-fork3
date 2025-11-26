@@ -1263,11 +1263,11 @@
                     console.log('Updating record with ID:', existingId);
                     console.log('Data to update:', data);
 
+                    // Don't use .select() to avoid schema cache issues
                     saveResult = await supabase
                         .from('timeless_content')
                         .update(data)
-                        .eq('id', existingId)
-                        .select();
+                        .eq('id', existingId);
 
                     console.log('Update result:', saveResult);
                 } else {
@@ -1277,8 +1277,7 @@
 
                     saveResult = await supabase
                         .from('timeless_content')
-                        .insert(data)
-                        .select();
+                        .insert(data);
 
                     console.log('Insert result:', saveResult);
                 }
