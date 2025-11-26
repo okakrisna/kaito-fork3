@@ -473,11 +473,13 @@
                 // Load completed orders from timeless_content
                 let completedOrders = [];
                 try {
-                    console.log('Fetching completed orders from:', `${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.completed`);
-                    const ordersResponse = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.completed`, {
+                    const url = `${SUPABASE_URL}/rest/v1/timeless_content?select=id,couple_names,template_name,price,completed_at,status&status=eq.completed&order=completed_at.desc.nullslast`;
+                    console.log('Fetching completed orders from:', url);
+                    const ordersResponse = await fetch(url, {
                         headers: {
                             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'apikey': SUPABASE_ANON_KEY
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json'
                         }
                     });
 
