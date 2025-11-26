@@ -449,33 +449,48 @@
 
         async function loadSales() {
             try {
-                // Load manual sales
-                const manualResponse = await fetch(`${SUPABASE_URL}/rest/v1/template_sales?select=*&order=sale_date.desc`, {
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'apikey': SUPABASE_ANON_KEY
+                // Load manual sales (with fallback if table doesn't exist)
+                let manualSales = [];
+                try {
+                    const manualResponse = await fetch(`${SUPABASE_URL}/rest/v1/template_sales?select=*&order=sale_date.desc`, {
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY
+                        }
+                    });
+
+                    if (manualResponse.ok) {
+                        manualSales = await manualResponse.json();
+                        console.log('Manual sales loaded:', manualSales.length);
+                    } else {
+                        console.warn('Manual sales table not found, using only completed orders');
                     }
-                });
-
-                if (!manualResponse.ok) {
-                    throw new Error('Failed to load manual sales data');
+                } catch (err) {
+                    console.warn('Error loading manual sales:', err);
+                    // Continue with empty manual sales
                 }
-
-                const manualSales = await manualResponse.json();
 
                 // Load completed orders from timeless_content
-                const ordersResponse = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.completed&order=completed_at.desc`, {
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'apikey': SUPABASE_ANON_KEY
+                let completedOrders = [];
+                try {
+                    const ordersResponse = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.completed`, {
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY
+                        }
+                    });
+
+                    if (ordersResponse.ok) {
+                        completedOrders = await ordersResponse.json();
+                        console.log('Completed orders loaded:', completedOrders.length);
+                    } else {
+                        const errorText = await ordersResponse.text();
+                        console.error('Failed to load completed orders:', errorText);
                     }
-                });
-
-                if (!ordersResponse.ok) {
-                    throw new Error('Failed to load completed orders');
+                } catch (err) {
+                    console.error('Error loading completed orders:', err);
+                    // Continue with empty orders
                 }
-
-                const completedOrders = await ordersResponse.json();
 
                 // Transform completed orders to sales format
                 const orderSales = completedOrders
@@ -520,7 +535,8 @@
             } catch (error) {
                 console.error('Error loading sales:', error);
                 document.getElementById('loading').innerHTML = `
-                    <p style="color: #fc8181;">❌ Error loading sales data. Please refresh the page.</p>
+                    <p style="color: #fc8181;">❌ Error loading sales data: ${error.message}</p>
+                    <p style="color: #718096; font-size: 14px; margin-top: 10px;">Please check the browser console for details.</p>
                 `;
             }
         }
