@@ -473,6 +473,7 @@
                 // Load completed orders from timeless_content
                 let completedOrders = [];
                 try {
+                    console.log('Fetching completed orders from:', `${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.completed`);
                     const ordersResponse = await fetch(`${SUPABASE_URL}/rest/v1/timeless_content?select=*&status=eq.completed`, {
                         headers: {
                             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
@@ -480,12 +481,15 @@
                         }
                     });
 
+                    console.log('Orders response status:', ordersResponse.status);
+
                     if (ordersResponse.ok) {
                         completedOrders = await ordersResponse.json();
                         console.log('Completed orders loaded:', completedOrders.length);
+                        console.log('Orders data:', completedOrders);
                     } else {
                         const errorText = await ordersResponse.text();
-                        console.error('Failed to load completed orders:', errorText);
+                        console.error('Failed to load completed orders:', ordersResponse.status, errorText);
                     }
                 } catch (err) {
                     console.error('Error loading completed orders:', err);
@@ -519,11 +523,12 @@
 
                 filteredSales = allSales;
 
-                console.log('Sales loaded:', {
-                    manual: manualSales.length,
-                    orders: orderSales.length,
-                    total: allSales.length
-                });
+                console.log('===== SALES SUMMARY =====');
+                console.log('Manual sales:', manualSales.length);
+                console.log('Order sales:', orderSales.length);
+                console.log('Total sales:', allSales.length);
+                console.log('All sales data:', allSales);
+                console.log('========================');
 
                 updateStats();
                 renderCharts();
