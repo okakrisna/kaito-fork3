@@ -6,6 +6,7 @@
     <title>Sales Analytics - Wedding Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -442,6 +443,9 @@
         const SUPABASE_URL = 'https://fnewihswvgtgzzsfaeis.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZXdpaHN3dmd0Z3p6c2ZhZWlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NzAwNzcsImV4cCI6MjA3OTU0NjA3N30.0OiXAfBDe5qGw8us5i9rjfNR75XdS0RlFojhy_RhKsY';
 
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let allSales = [];
         let filteredSales = [];
         let salesChart = null;
@@ -470,28 +474,22 @@
                     // Continue with empty manual sales
                 }
 
-                // Load completed orders from timeless_content
+                // Load completed orders from timeless_content using Supabase client
                 let completedOrders = [];
                 try {
-                    const url = `${SUPABASE_URL}/rest/v1/timeless_content?select=id,couple_names,template_name,price,completed_at,status&status=eq.completed&order=completed_at.desc.nullslast`;
-                    console.log('Fetching completed orders from:', url);
-                    const ordersResponse = await fetch(url, {
-                        headers: {
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                    console.log('Fetching completed orders using Supabase client...');
+                    const { data, error } = await supabase
+                        .from('timeless_content')
+                        .select('id, couple_names, template_name, price, completed_at, status')
+                        .eq('status', 'completed')
+                        .order('completed_at', { ascending: false, nullsFirst: false });
 
-                    console.log('Orders response status:', ordersResponse.status);
-
-                    if (ordersResponse.ok) {
-                        completedOrders = await ordersResponse.json();
+                    if (error) {
+                        console.error('Supabase error:', error);
+                    } else {
+                        completedOrders = data || [];
                         console.log('Completed orders loaded:', completedOrders.length);
                         console.log('Orders data:', completedOrders);
-                    } else {
-                        const errorText = await ordersResponse.text();
-                        console.error('Failed to load completed orders:', ordersResponse.status, errorText);
                     }
                 } catch (err) {
                     console.error('Error loading completed orders:', err);
